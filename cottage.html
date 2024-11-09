@@ -17,11 +17,20 @@
             background: linear-gradient(135deg, #e0f7fa, #f2f2f2);
             color: #333;
         }
+
+        /* Image Styling */
+        #header-image {
+            max-width: 300px;
+            width: 100%;
+            margin-top: 20px;
+            border-radius: 10px;
+        }
         
         /* Title and Grid */
         h1 {
             font-size: 2em;
             color: #00796b;
+            margin-top: 10px;
             margin-bottom: 10px;
         }
         .grid {
@@ -124,24 +133,17 @@
             color: #00796b;
             margin-bottom: 10px;
         }
-        #reward input[type="email"] {
-            padding: 10px;
-            font-size: 16px;
-            width: 220px;
-            border: 2px solid #00796b;
-            border-radius: 8px;
-            outline: none;
-            margin-bottom: 10px;
-        }
-        #reward button {
-            background-color: #339966;
-            color: #fff;
-            font-size: 16px;
+        #reward img {
+            max-width: 200px;
+            margin-top: 10px;
             border-radius: 8px;
         }
     </style>
 </head>
 <body>
+
+<!-- Header Image -->
+<img id="header-image" src="Spring.png" alt="Cottage Springs Spring Theme">
 
 <h1>Wordle - Sponsored by Cottage Springs</h1>
 
@@ -158,9 +160,8 @@
 
 <!-- Reward Section -->
 <div id="reward">
-    <p>Congratulations! Claim your prize below.</p>
-    <input type="email" id="emailInput" placeholder="Enter your email">
-    <button onclick="claimPrize()">Claim Prize</button>
+    <p>Congrats! Come to me tonight to get your free drink.</p>
+    <img src="Spring.png" alt="Cottage Springs Lime">
     <br><br>
     <a href="https://cottagesprings.com/shop" target="_blank">
         <button style="padding: 10px 20px; background-color: #00796b; color: #fff; border-radius: 8px;">
@@ -221,15 +222,6 @@
             message.textContent = `Game Over! The word was "${correctWord}".`;
             guessInput.disabled = true;
             return;
-        }
-    }
-
-    function claimPrize() {
-        const email = document.getElementById("emailInput").value;
-        if (email) {
-            alert("Thanks! Your prize information will be sent to " + email);
-        } else {
-            alert("Please enter a valid email address to claim your prize.");
         }
     }
 
