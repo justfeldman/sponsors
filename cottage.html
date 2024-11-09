@@ -5,71 +5,112 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wordle - Sponsored by Cottage Springs</title>
     <style>
+        /* General Styling */
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
-            background-color: #f2f2f2;
+            background: linear-gradient(135deg, #e0f7fa, #f2f2f2);
+            color: #333;
         }
+        
+        /* Title and Grid */
         h1 {
-            color: #339966;
+            font-size: 2em;
+            color: #00796b;
+            margin-bottom: 10px;
         }
         .grid {
             display: grid;
-            grid-template-columns: repeat(4, 50px);
-            gap: 5px;
-            margin-bottom: 20px;
+            grid-template-columns: repeat(6, 60px);
+            gap: 8px;
+            margin: 20px 0;
+            width: fit-content;
+            padding: 10px;
+            border-radius: 10px;
+            background-color: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
+        
+        /* Cell Styling */
         .cell {
-            width: 50px;
-            height: 50px;
+            width: 60px;
+            height: 60px;
             font-size: 24px;
+            font-weight: bold;
             display: flex;
             align-items: center;
             justify-content: center;
+            border-radius: 8px;
+            background-color: #ffffff;
             border: 2px solid #ccc;
-            background-color: #fff;
-            color: #333;
+            transition: background-color 0.3s ease;
         }
         .correct {
             background-color: #66bb6a;
             color: #fff;
         }
         .present {
-            background-color: #ffeb3b;
+            background-color: #ffd54f;
             color: #333;
         }
         .absent {
-            background-color: #ccc;
+            background-color: #b0bec5;
             color: #fff;
         }
-        .message {
-            font-size: 18px;
-            color: #333;
-            margin: 10px 0;
+
+        /* Input and Button */
+        .controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
         }
         input[type="text"] {
             padding: 10px;
             font-size: 18px;
-            width: 200px;
+            width: 250px;
+            border: 2px solid #00796b;
+            border-radius: 8px;
+            outline: none;
         }
         button {
-            padding: 10px;
+            padding: 10px 20px;
             font-size: 18px;
-            margin-top: 10px;
-            background-color: #339966;
             color: #fff;
+            background-color: #00796b;
             border: none;
+            border-radius: 8px;
             cursor: pointer;
+            transition: background-color 0.3s;
         }
+        button:hover {
+            background-color: #004d40;
+        }
+
+        /* Message Styling */
+        .message {
+            font-size: 18px;
+            color: #333;
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        /* Sponsorship Message */
         .sponsor {
             font-size: 14px;
-            color: #888;
+            color: #555;
             margin-top: 20px;
+            text-align: center;
+        }
+        .sponsor span {
+            color: #00796b;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -79,15 +120,17 @@
 
 <div class="grid" id="grid"></div>
 
-<div class="message" id="message">Guess the 4-letter word!</div>
+<div class="controls">
+    <input type="text" id="guessInput" maxlength="6" placeholder="Enter your guess">
+    <button onclick="makeGuess()">Submit Guess</button>
+</div>
 
-<input type="text" id="guessInput" maxlength="4" placeholder="Enter your guess">
-<button onclick="makeGuess()">Submit Guess</button>
+<div class="message" id="message">Guess the 6-letter word!</div>
 
-<p class="sponsor">Sponsored by Cottage Springs - Try our refreshing lime flavor!</p>
+<p class="sponsor">Sponsored by <span>Cottage Springs</span> - Try our refreshing lime flavor!</p>
 
 <script>
-    const correctWord = "LIME";
+    const correctWord = "SPRING";  // Set the answer to "SPRING"
     const maxGuesses = 6;
     let currentGuess = 0;
 
@@ -96,7 +139,7 @@
 
     function initGrid() {
         grid.innerHTML = '';
-        for (let i = 0; i < maxGuesses * 4; i++) {
+        for (let i = 0; i < maxGuesses * 6; i++) {
             const cell = document.createElement("div");
             cell.classList.add("cell");
             grid.appendChild(cell);
@@ -107,13 +150,13 @@
         const guessInput = document.getElementById("guessInput");
         const guess = guessInput.value.toUpperCase();
         
-        if (guess.length !== 4) {
-            message.textContent = "Please enter a 4-letter word.";
+        if (guess.length !== 6) {
+            message.textContent = "Please enter a 6-letter word.";
             return;
         }
 
-        const startIdx = currentGuess * 4;
-        for (let i = 0; i < 4; i++) {
+        const startIdx = currentGuess * 6;
+        for (let i = 0; i < 6; i++) {
             const cell = grid.children[startIdx + i];
             cell.textContent = guess[i];
             
@@ -130,7 +173,7 @@
         guessInput.value = "";
 
         if (guess === correctWord) {
-            message.textContent = "Congratulations! You guessed it!";
+            message.textContent = "Congratulations! You guessed it and won a Cottage Springs giveaway!";
             guessInput.disabled = true;
             return;
         } else if (currentGuess >= maxGuesses) {
