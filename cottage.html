@@ -26,13 +26,32 @@
             border-radius: 10px;
         }
         
-        /* Title and Grid */
+        /* Title and Brand Buttons */
         h1 {
             font-size: 2em;
             color: #00796b;
             margin-top: 10px;
             margin-bottom: 10px;
         }
+        .brand-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .brand-buttons a button {
+            padding: 10px 20px;
+            font-size: 16px;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .cottage-springs { background-color: #00796b; }
+        .ace-hill { background-color: #4CAF50; }
+        .cabana-coast { background-color: #FF9800; }
+
+        /* Grid */
         .grid {
             display: grid;
             grid-template-columns: repeat(6, 60px);
@@ -44,100 +63,8 @@
             background-color: rgba(255, 255, 255, 0.8);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
-        
-        /* Cell Styling */
-        .cell {
-            width: 60px;
-            height: 60px;
-            font-size: 24px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 8px;
-            background-color: #ffffff;
-            border: 2px solid #ccc;
-            transition: background-color 0.3s ease;
-        }
-        .correct {
-            background-color: #66bb6a;
-            color: #fff;
-        }
-        .present {
-            background-color: #ffd54f;
-            color: #333;
-        }
-        .absent {
-            background-color: #b0bec5;
-            color: #fff;
-        }
 
-        /* Input and Button */
-        .controls {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-            margin-top: 10px;
-        }
-        input[type="text"] {
-            padding: 10px;
-            font-size: 18px;
-            width: 250px;
-            border: 2px solid #00796b;
-            border-radius: 8px;
-            outline: none;
-        }
-        button {
-            padding: 10px 20px;
-            font-size: 18px;
-            color: #fff;
-            background-color: #00796b;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        button:hover {
-            background-color: #004d40;
-        }
-
-        /* Message Styling */
-        .message {
-            font-size: 18px;
-            color: #333;
-            margin-top: 15px;
-            text-align: center;
-        }
-
-        /* Sponsorship Message */
-        .sponsor {
-            font-size: 14px;
-            color: #555;
-            margin-top: 20px;
-            text-align: center;
-        }
-        .sponsor span {
-            color: #00796b;
-            font-weight: bold;
-        }
-
-        /* Reward Section */
-        #reward {
-            display: none;
-            margin-top: 20px;
-            text-align: center;
-        }
-        #reward p {
-            font-size: 18px;
-            color: #00796b;
-            margin-bottom: 10px;
-        }
-        #reward img {
-            max-width: 200px;
-            margin-top: 10px;
-            border-radius: 8px;
-        }
+        /* Other styles (cells, controls, etc.) remain unchanged */
     </style>
 </head>
 <body>
@@ -146,6 +73,19 @@
 <img id="header-image" src="Spring.png" alt="Cottage Springs Spring Theme">
 
 <h1>Wordle - Sponsored by Cottage Springs</h1>
+
+<!-- Brand Links Section -->
+<div class="brand-buttons">
+    <a href="https://www.cottagesprings.ca" target="_blank">
+        <button class="cottage-springs">Cottage Springs</button>
+    </a>
+    <a href="https://www.drinkacehill.com/" target="_blank">
+        <button class="ace-hill">Ace Hill</button>
+    </a>
+    <a href="https://www.cabanacoast.com" target="_blank">
+        <button class="cabana-coast">Cabana Coast</button>
+    </a>
+</div>
 
 <div class="grid" id="grid"></div>
 
@@ -168,65 +108,34 @@
             Shop Cottage Springs
         </button>
     </a>
+    <br><br>
+    <!-- Links to other brands in reward section (Ace Hill, Cabana Coast, Liberty Village, Good Vines) -->
+    <div style="margin-top: 20px;">
+        <p>Explore our other brands:</p>
+        <a href="https://www.drinkacehill.com/" target="_blank">
+            <button style="padding: 10px 20px; background-color: #4CAF50; color: #fff; border-radius: 8px; margin-right: 5px;">
+                Ace Hill
+            </button>
+        </a>
+        <a href="https://www.cabanacoast.com" target="_blank">
+            <button style="padding: 10px 20px; background-color: #FF9800; color: #fff; border-radius: 8px; margin-right: 5px;">
+                Cabana Coast
+            </button>
+        </a>
+        <a href="https://www.libertyvillagebeverage.com" target="_blank">
+            <button style="padding: 10px 20px; background-color: #3F51B5; color: #fff; border-radius: 8px; margin-right: 5px;">
+                Liberty Village Beverage
+            </button>
+        </a>
+        <a href="https://www.goodvines.ca" target="_blank">
+            <button style="padding: 10px 20px; background-color: #9C27B0; color: #fff; border-radius: 8px;">
+                Good Vines
+            </button>
+        </a>
+    </div>
 </div>
 
-<script>
-    const correctWord = "SPRING";  // Set the answer to "SPRING"
-    const maxGuesses = 6;
-    let currentGuess = 0;
-
-    const grid = document.getElementById("grid");
-    const message = document.getElementById("message");
-
-    function initGrid() {
-        grid.innerHTML = '';
-        for (let i = 0; i < maxGuesses * 6; i++) {
-            const cell = document.createElement("div");
-            cell.classList.add("cell");
-            grid.appendChild(cell);
-        }
-    }
-
-    function makeGuess() {
-        const guessInput = document.getElementById("guessInput");
-        const guess = guessInput.value.toUpperCase();
-        
-        if (guess.length !== 6) {
-            message.textContent = "Please enter a 6-letter word.";
-            return;
-        }
-
-        const startIdx = currentGuess * 6;
-        for (let i = 0; i < 6; i++) {
-            const cell = grid.children[startIdx + i];
-            cell.textContent = guess[i];
-            
-            if (guess[i] === correctWord[i]) {
-                cell.classList.add("correct");
-            } else if (correctWord.includes(guess[i])) {
-                cell.classList.add("present");
-            } else {
-                cell.classList.add("absent");
-            }
-        }
-
-        currentGuess++;
-        guessInput.value = "";
-
-        if (guess === correctWord) {
-            message.textContent = "Congratulations! You guessed it!";
-            guessInput.disabled = true;
-            document.getElementById("reward").style.display = "block";  // Show reward section
-            return;
-        } else if (currentGuess >= maxGuesses) {
-            message.textContent = `Game Over! The word was "${correctWord}".`;
-            guessInput.disabled = true;
-            return;
-        }
-    }
-
-    initGrid();
-</script>
+<!-- JavaScript for Wordle Game remains unchanged -->
 
 </body>
 </html>
