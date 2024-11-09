@@ -112,6 +112,33 @@
             color: #00796b;
             font-weight: bold;
         }
+
+        /* Reward Section */
+        #reward {
+            display: none;
+            margin-top: 20px;
+            text-align: center;
+        }
+        #reward p {
+            font-size: 18px;
+            color: #00796b;
+            margin-bottom: 10px;
+        }
+        #reward input[type="email"] {
+            padding: 10px;
+            font-size: 16px;
+            width: 220px;
+            border: 2px solid #00796b;
+            border-radius: 8px;
+            outline: none;
+            margin-bottom: 10px;
+        }
+        #reward button {
+            background-color: #339966;
+            color: #fff;
+            font-size: 16px;
+            border-radius: 8px;
+        }
     </style>
 </head>
 <body>
@@ -128,6 +155,19 @@
 <div class="message" id="message">Guess the 6-letter word!</div>
 
 <p class="sponsor">Sponsored by <span>Cottage Springs</span> - Try our refreshing lime flavor!</p>
+
+<!-- Reward Section -->
+<div id="reward">
+    <p>Congratulations! Claim your prize below.</p>
+    <input type="email" id="emailInput" placeholder="Enter your email">
+    <button onclick="claimPrize()">Claim Prize</button>
+    <br><br>
+    <a href="https://cottagesprings.com/shop" target="_blank">
+        <button style="padding: 10px 20px; background-color: #00796b; color: #fff; border-radius: 8px;">
+            Shop Cottage Springs
+        </button>
+    </a>
+</div>
 
 <script>
     const correctWord = "SPRING";  // Set the answer to "SPRING"
@@ -173,13 +213,23 @@
         guessInput.value = "";
 
         if (guess === correctWord) {
-            message.textContent = "Congratulations! You guessed it and won a Cottage Springs giveaway!";
+            message.textContent = "Congratulations! You guessed it!";
             guessInput.disabled = true;
+            document.getElementById("reward").style.display = "block";  // Show reward section
             return;
         } else if (currentGuess >= maxGuesses) {
             message.textContent = `Game Over! The word was "${correctWord}".`;
             guessInput.disabled = true;
             return;
+        }
+    }
+
+    function claimPrize() {
+        const email = document.getElementById("emailInput").value;
+        if (email) {
+            alert("Thanks! Your prize information will be sent to " + email);
+        } else {
+            alert("Please enter a valid email address to claim your prize.");
         }
     }
 
