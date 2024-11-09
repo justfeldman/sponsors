@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wordle - Sponsored by Cottage Springs</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f2f2f2;
+        }
+        h1 {
+            color: #339966;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(4, 50px);
+            gap: 5px;
+            margin-bottom: 20px;
+        }
+        .cell {
+            width: 50px;
+            height: 50px;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #ccc;
+            background-color: #fff;
+            color: #333;
+        }
+        .correct {
+            background-color: #66bb6a;
+            color: #fff;
+        }
+        .present {
+            background-color: #ffeb3b;
+            color: #333;
+        }
+        .absent {
+            background-color: #ccc;
+            color: #fff;
+        }
+        .message {
+            font-size: 18px;
+            color: #333;
+            margin: 10px 0;
+        }
+        input[type="text"] {
+            padding: 10px;
+            font-size: 18px;
+            width: 200px;
+        }
+        button {
+            padding: 10px;
+            font-size: 18px;
+            margin-top: 10px;
+            background-color: #339966;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        .sponsor {
+            font-size: 14px;
+            color: #888;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Wordle - Sponsored by Cottage Springs</h1>
+
+<div class="grid" id="grid"></div>
+
+<div class="message" id="message">Guess the 4-letter word!</div>
+
+<input type="text" id="guessInput" maxlength="4" placeholder="Enter your guess">
+<button onclick="makeGuess()">Submit Guess</button>
+
+<p class="sponsor">Sponsored by Cottage Springs - Try our refreshing lime flavor!</p>
+
+<script>
+    const correctWord = "LIME";
+    const maxGuesses = 6;
+    let currentGuess = 0;
+
+    const grid = document.getElementById("grid");
+    const message = document.getElementById("message");
+
+    function initGrid() {
+        grid.innerHTML = '';
+        for (let i = 0; i < maxGuesses * 4; i++) {
+            const cell = document.createElement("div");
+            cell.classList.add("cell");
+            grid.appendChild(cell);
+        }
+    }
+
+    function makeGuess() {
+        const guessInput = document.getElementById("guessInput");
+        const guess = guessInput.value.toUpperCase();
+        
+        if (guess.length !== 4) {
+            message.textContent = "Please enter a 4-letter word.";
+            return;
+        }
+
+        const startIdx = currentGuess * 4;
+        for (let i = 0; i < 4; i++) {
+            const cell = grid.children[startIdx + i];
+            cell.textContent = guess[i];
+            
+            if (guess[i] === correctWord[i]) {
+                cell.classList.add("correct");
+            } else if (correctWord.includes(guess[i])) {
+                cell.classList.add("present");
+            } else {
+                cell.classList.add("absent");
+            }
+        }
+
+        currentGuess++;
+        guessInput.value = "";
+
+        if (guess === correctWord) {
+            message.textContent = "Congratulations! You guessed it!";
+            guessInput.disabled = true;
+            return;
+        } else if (currentGuess >= maxGuesses) {
+            message.textContent = `Game Over! The word was "${correctWord}".`;
+            guessInput.disabled = true;
+            return;
+        }
+    }
+
+    initGrid();
+</script>
+
+</body>
+</html>
