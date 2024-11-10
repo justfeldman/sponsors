@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top 10 Photo Gallery</title>
+    <style>
+        /* Basic Reset */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Set background image and styling */
+        body {
+            font-family: Arial, sans-serif;
+            background: url('stars.png') no-repeat center center fixed;
+            background-size: cover;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        /* Gallery Styling for Mobile - 2 columns */
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            max-width: 100%;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .gallery img {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 1/1;
+            border-radius: 5px;
+            object-fit: cover;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .gallery img:hover {
+            transform: scale(1.05);
+        }
+
+        /* Lightbox Styling */
+        .lightbox {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            display: none;
+            z-index: 1000;
+        }
+
+        .lightbox img {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 8px;
+        }
+
+        /* Close Button */
+        .close {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            color: #fff;
+            font-size: 24px;
+            text-decoration: none;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        /* Responsive for larger screens */
+        @media (min-width: 600px) {
+            .gallery {
+                grid-template-columns: repeat(3, 1fr); /* 3 columns on larger screens */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Top 10 Photo Gallery</h1>
+    <div class="gallery">
+        <!-- Replace the src paths with your chosen images -->
+        <img src="path/to/your/images/image1.jpg" alt="Image 1" onclick="openLightbox('path/to/your/images/image1.jpg')">
+        <img src="path/to/your/images/image2.jpg" alt="Image 2" onclick="openLightbox('path/to/your/images/image2.jpg')">
+        <img src="path/to/your/images/image3.jpg" alt="Image 3" onclick="openLightbox('path/to/your/images/image3.jpg')">
+        <img src="path/to/your/images/image4.jpg" alt="Image 4" onclick="openLightbox('path/to/your/images/image4.jpg')">
+        <img src="path/to/your/images/image5.jpg" alt="Image 5" onclick="openLightbox('path/to/your/images/image5.jpg')">
+        <img src="path/to/your/images/image6.jpg" alt="Image 6" onclick="openLightbox('path/to/your/images/image6.jpg')">
+        <img src="path/to/your/images/image7.jpg" alt="Image 7" onclick="openLightbox('path/to/your/images/image7.jpg')">
+        <img src="path/to/your/images/image8.jpg" alt="Image 8" onclick="openLightbox('path/to/your/images/image8.jpg')">
+        <img src="path/to/your/images/image9.jpg" alt="Image 9" onclick="openLightbox('path/to/your/images/image9.jpg')">
+        <img src="path/to/your/images/image10.jpg" alt="Image 10" onclick="openLightbox('path/to/your/images/image10.jpg')">
+    </div>
+
+    <!-- Lightbox Display -->
+    <div id="lightbox" class="lightbox">
+        <a href="#" class="close" onclick="closeLightbox()">&times;</a>
+        <img id="lightbox-img" src="" alt="Enlarged Image">
+    </div>
+
+    <script>
+        // JavaScript to handle Lightbox
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+
+        // Lightbox Functions
+        function openLightbox(src) {
+            lightboxImg.src = src;
+            lightbox.style.display = 'flex';
+        }
+
+        function closeLightbox() {
+            lightbox.style.display = 'none';
+            lightboxImg.src = ''; // Clear the source to prevent loading issues
+        }
+    </script>
+
+</body>
+</html>
