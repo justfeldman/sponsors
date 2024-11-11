@@ -3,183 +3,182 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wordle - Sponsored by Cottage Springs</title>
+    <title>Bangarang Style Mockup</title>
     <style>
-        /* General Styling */
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Arial', sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            min-height: 100vh;
-            margin: 0;
-            background: linear-gradient(135deg, #e0f7fa, #f2f2f2);
+            background-color: #e0f7fa;
             color: #333;
-            padding-top: 20px;
+            overflow-x: hidden;
         }
 
-        /* Top Button for Winning a Free Drink */
-        .buy-drinks {
-            margin-bottom: 15px;
-        }
-        .buy-drinks a button {
-            padding: 10px 20px;
-            font-size: 18px;
-            background-color: #00796b;
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        .buy-drinks a button:hover {
-            background-color: #004d40;
-        }
-
-        /* Brand Buttons */
-        .brand-buttons {
+        /* Navigation Bar */
+        .navbar {
             display: flex;
-            gap: 10px;
+            justify-content: space-around;
+            align-items: center;
+            background-color: #a6dcef;
+            padding: 10px;
+            color: #333;
+        }
+
+        .navbar a {
+            text-decoration: none;
+            color: #555;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+
+        /* Banner Section */
+        .banner {
+            position: relative;
+            text-align: center;
+            padding: 50px;
+            background: linear-gradient(90deg, #d1f0f5, #f0e4f5);
+            color: #fff;
+        }
+
+        .banner h1 {
+            font-size: 2.5em;
+            color: #ff4081;
+        }
+
+        .banner p {
+            font-size: 1.2em;
+            color: #666;
+            margin-top: 10px;
+        }
+
+        /* Age Verification Modal */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #ffa726;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            max-width: 300px;
+            width: 80%;
+        }
+
+        .modal-content h2 {
+            color: #fff;
+            font-size: 1.5em;
             margin-bottom: 20px;
         }
-        .brand-buttons a button {
-            padding: 10px 20px;
-            font-size: 16px;
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        .cottage-springs { background-color: #00796b; }
-        .ace-hill { background-color: #4CAF50; }
 
-        /* Wordle Header and Grid */
-        .wordle-header {
-            font-size: 1.5em;
-            color: #333;
-            margin-bottom: 10px;
+        .modal-content button {
+            background-color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1em;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+            font-weight: bold;
+        }
+
+        .modal-content button:hover {
+            background-color: #ffeb3b;
+        }
+
+        /* Main Content */
+        .content {
+            padding: 20px;
             text-align: center;
         }
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(6, 60px);
-            gap: 8px;
-            margin: 20px 0;
-            width: fit-content;
-            padding: 10px;
-            border-radius: 10px;
-            background-color: rgba(255, 255, 255, 0.8);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+        .content h2 {
+            color: #ff4081;
+            font-size: 2em;
+            margin-bottom: 10px;
         }
 
-        /* Cell Styling */
-        .cell {
-            width: 60px;
-            height: 60px;
-            font-size: 24px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 8px;
-            background-color: #ffffff;
-            border: 2px solid #ccc;
-            transition: background-color 0.3s ease;
+        .content img {
+            max-width: 100%;
+            border-radius: 10px;
+            margin-top: 20px;
         }
-        .correct { background-color: #66bb6a; color: #fff; }
-        .present { background-color: #ffd54f; color: #333; }
-        .absent { background-color: #b0bec5; color: #fff; }
+
+        /* Footer */
+        .footer {
+            background-color: #a6dcef;
+            padding: 20px;
+            text-align: center;
+            color: #555;
+        }
     </style>
 </head>
 <body>
 
-<!-- Win a Free Drink Button -->
-<div class="buy-drinks">
-    <a href="https://www.cottagesprings.ca" target="_blank">
-        <button>Win a Free Drink!</button>
-    </a>
+<!-- Navigation Bar -->
+<div class="navbar">
+    <a href="#home">HOME</a>
+    <a href="#about">ABOUT</a>
+    <a href="#product">PRODUCT</a>
+    <a href="#shop">SHOP ONLINE</a>
+    <a href="#campus-captain">CAMPUS CAPTAIN</a>
 </div>
 
-<!-- Brand Links Section -->
-<div class="brand-buttons">
-    <a href="https://www.cottagesprings.ca" target="_blank">
-        <button class="cottage-springs">Cottage Springs</button>
-    </a>
-    <a href="https://www.drinkacehill.com/" target="_blank">
-        <button class="ace-hill">Ace Hill</button>
-    </a>
+<!-- Banner Section -->
+<div class="banner">
+    <h1>VODKA SELTZERS</h1>
+    <p>Refreshing Vodka Seltzers Made with All-Natural Flavors</p>
 </div>
 
-<!-- Wordle Header -->
-<h2 class="wordle-header">Get the Word Right and get a drink coupon tonight!</h2>
-
-<!-- Wordle Grid -->
-<div class="grid" id="grid"></div>
-
-<div class="controls">
-    <input type="text" id="guessInput" maxlength="6" placeholder="Enter your guess">
-    <button onclick="makeGuess()">Submit Guess</button>
+<!-- Age Verification Modal -->
+<div class="modal" id="ageModal">
+    <div class="modal-content">
+        <h2>WELCOME TO BANGARANG!</h2>
+        <p>Are you over 19?</p>
+        <button onclick="verifyAge(true)">Yes</button>
+        <button onclick="verifyAge(false)">No</button>
+        <p style="color: #fff; font-size: 0.9em;">Please Drink Responsibly</p>
+    </div>
 </div>
 
-<div class="message" id="message">Guess the 6-letter word!</div>
+<!-- Main Content -->
+<div class="content" id="product">
+    <h2>Our Vodka Seltzers</h2>
+    <img src="https://via.placeholder.com/500x300" alt="Bangarang Vodka Seltzers">
+</div>
+
+<!-- Footer -->
+<div class="footer">
+    <p>Shipping now available across Ontario!</p>
+</div>
 
 <script>
-    const correctWord = "SPRING";  // Set the answer to "SPRING"
-    const maxGuesses = 6;
-    let currentGuess = 0;
+    // Display the age verification modal on page load
+    window.onload = function() {
+        document.getElementById('ageModal').style.display = 'flex';
+    };
 
-    const grid = document.getElementById("grid");
-    const message = document.getElementById("message");
-
-    function initGrid() {
-        grid.innerHTML = '';
-        for (let i = 0; i < maxGuesses * 6; i++) {
-            const cell = document.createElement("div");
-            cell.classList.add("cell");
-            grid.appendChild(cell);
+    function verifyAge(isOldEnough) {
+        const modal = document.getElementById('ageModal');
+        if (isOldEnough) {
+            modal.style.display = 'none'; // Hide the modal
+        } else {
+            alert("You must be over 19 to enter this site.");
         }
     }
-
-    function makeGuess() {
-        const guessInput = document.getElementById("guessInput");
-        const guess = guessInput.value.toUpperCase();
-        
-        if (guess.length !== 6) {
-            message.textContent = "Please enter a 6-letter word.";
-            return;
-        }
-
-        const startIdx = currentGuess * 6;
-        for (let i = 0; i < 6; i++) {
-            const cell = grid.children[startIdx + i];
-            cell.textContent = guess[i];
-            
-            if (guess[i] === correctWord[i]) {
-                cell.classList.add("correct");
-            } else if (correctWord.includes(guess[i])) {
-                cell.classList.add("present");
-            } else {
-                cell.classList.add("absent");
-            }
-        }
-
-        currentGuess++;
-        guessInput.value = "";
-
-        if (guess === correctWord) {
-            message.textContent = "Congratulations! You guessed it!";
-            guessInput.disabled = true;
-            return;
-        } else if (currentGuess >= maxGuesses) {
-            message.textContent = `Game Over! The word was "${correctWord}".`;
-            guessInput.disabled = true;
-            return;
-        }
-    }
-
-    initGrid();
 </script>
 
 </body>
