@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wordle - Sponsored by Cottage Springs</title>
+    <style>
+        /* General Styling */
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #e0f7fa, #f2f2f2);
+            color: #333;
+            padding-top: 20px;
+        }
+
+        /* Top Button for Winning a Free Drink */
+        .buy-drinks {
+            margin-bottom: 15px;
+        }
+        .buy-drinks a button {
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #00796b;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .buy-drinks a button:hover {
+            background-color: #004d40;
+        }
+
+        /* Brand Buttons */
+        .brand-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .brand-buttons a button {
+            padding: 10px 20px;
+            font-size: 16px;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .cottage-springs { background-color: #00796b; }
+        .ace-hill { background-color: #4CAF50; }
+
+        /* Wordle Header and Grid */
+        .wordle-header {
+            font-size: 1.5em;
+            color: #333;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(6, 60px);
+            gap: 8px;
+            margin: 20px 0;
+            width: fit-content;
+            padding: 10px;
+            border-radius: 10px;
+            background-color: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Cell Styling */
+        .cell {
+            width: 60px;
+            height: 60px;
+            font-size: 24px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            background-color: #ffffff;
+            border: 2px solid #ccc;
+            transition: background-color 0.3s ease;
+        }
+        .correct { background-color: #66bb6a; color: #fff; }
+        .present { background-color: #ffd54f; color: #333; }
+        .absent { background-color: #b0bec5; color: #fff; }
+    </style>
+</head>
+<body>
+
+<!-- Win a Free Drink Button -->
+<div class="buy-drinks">
+    <a href="https://www.cottagesprings.ca" target="_blank">
+        <button>Win a Free Drink!</button>
+    </a>
+</div>
+
+<!-- Brand Links Section -->
+<div class="brand-buttons">
+    <a href="https://www.cottagesprings.ca" target="_blank">
+        <button class="cottage-springs">Cottage Springs</button>
+    </a>
+    <a href="https://www.drinkacehill.com/" target="_blank">
+        <button class="ace-hill">Ace Hill</button>
+    </a>
+</div>
+
+<!-- Wordle Header -->
+<h2 class="wordle-header">Get the Word Right and get a drink coupon tonight!</h2>
+
+<!-- Wordle Grid -->
+<div class="grid" id="grid"></div>
+
+<div class="controls">
+    <input type="text" id="guessInput" maxlength="6" placeholder="Enter your guess">
+    <button onclick="makeGuess()">Submit Guess</button>
+</div>
+
+<div class="message" id="message">Guess the 6-letter word!</div>
+
+<script>
+    const correctWord = "SPRING";  // Set the answer to "SPRING"
+    const maxGuesses = 6;
+    let currentGuess = 0;
+
+    const grid = document.getElementById("grid");
+    const message = document.getElementById("message");
+
+    function initGrid() {
+        grid.innerHTML = '';
+        for (let i = 0; i < maxGuesses * 6; i++) {
+            const cell = document.createElement("div");
+            cell.classList.add("cell");
+            grid.appendChild(cell);
+        }
+    }
+
+    function makeGuess() {
+        const guessInput = document.getElementById("guessInput");
+        const guess = guessInput.value.toUpperCase();
+        
+        if (guess.length !== 6) {
+            message.textContent = "Please enter a 6-letter word.";
+            return;
+        }
+
+        const startIdx = currentGuess * 6;
+        for (let i = 0; i < 6; i++) {
+            const cell = grid.children[startIdx + i];
+            cell.textContent = guess[i];
+            
+            if (guess[i] === correctWord[i]) {
+                cell.classList.add("correct");
+            } else if (correctWord.includes(guess[i])) {
+                cell.classList.add("present");
+            } else {
+                cell.classList.add("absent");
+            }
+        }
+
+        currentGuess++;
+        guessInput.value = "";
+
+        if (guess === correctWord) {
+            message.textContent = "Congratulations! You guessed it!";
+            guessInput.disabled = true;
+            return;
+        } else if (currentGuess >= maxGuesses) {
+            message.textContent = `Game Over! The word was "${correctWord}".`;
+            guessInput.disabled = true;
+            return;
+        }
+    }
+
+    initGrid();
+</script>
+
+</body>
+</html>
