@@ -22,19 +22,19 @@
 
         /* Sponsor Logo */
         .sponsor-logo {
-            width: 180px;
-            height: 180px;
+            width: 150px;
+            height: 150px;
             border-radius: 50%;
             background-image: url('sponsorlogo2.png');
             background-size: cover;
             background-position: center;
             margin-bottom: 20px;
-            border: 6px solid #333;
+            border: 5px solid #333;
         }
 
         /* Wordle Header and Grid */
         .wordle-header {
-            font-size: 1.5em;
+            font-size: 1.3em;
             color: #333;
             margin-bottom: 10px;
             text-align: center;
@@ -42,8 +42,8 @@
 
         .grid {
             display: grid;
-            grid-template-columns: repeat(6, 60px);
-            gap: 8px;
+            grid-template-columns: repeat(6, 45px);
+            gap: 6px;
             margin: 20px 0;
             padding: 10px;
             border-radius: 10px;
@@ -53,9 +53,9 @@
 
         /* Cell Styling */
         .cell {
-            width: 60px;
-            height: 60px;
-            font-size: 24px;
+            width: 45px;
+            height: 45px;
+            font-size: 18px;
             font-weight: bold;
             display: flex;
             align-items: center;
@@ -66,9 +66,9 @@
             transition: background-color 0.3s ease;
             color: #333;
         }
-        .correct { background-color: #66bb6a; color: #fff; } /* Green for correct */
-        .present { background-color: #ffd54f; color: #333; } /* Yellow for present */
-        .absent { background-color: #b0bec5; color: #fff; } /* Light gray for absent */
+        .correct { background-color: #66bb6a; color: #fff; }
+        .present { background-color: #ffd54f; color: #333; }
+        .absent { background-color: #b0bec5; color: #fff; }
 
         /* Guess Input */
         .controls {
@@ -78,10 +78,10 @@
             margin-top: 20px;
         }
         .controls input[type="text"] {
-            padding: 10px;
-            font-size: 18px;
+            padding: 8px;
+            font-size: 16px;
             text-align: center;
-            width: 200px;
+            width: 180px;
             border: 2px solid #333;
             border-radius: 10px;
             margin-bottom: 10px;
@@ -89,7 +89,7 @@
             color: #333;
         }
         .controls button {
-            padding: 10px 20px;
+            padding: 8px 16px;
             font-size: 16px;
             background-color: #333;
             color: #fff;
@@ -110,43 +110,37 @@
             text-align: center;
         }
 
-        /* New Section - Welcome and Buttons */
-        .welcome-section {
-            margin-top: 30px;
-            text-align: center;
+        /* Mobile Adjustments */
+        @media (max-width: 600px) {
+            .sponsor-logo {
+                width: 120px;
+                height: 120px;
+                border: 4px solid #333;
+            }
+            .wordle-header {
+                font-size: 1.2em;
+            }
+            .grid {
+                grid-template-columns: repeat(6, 40px);
+                gap: 5px;
+            }
+            .cell {
+                width: 40px;
+                height: 40px;
+                font-size: 16px;
+            }
+            .controls input[type="text"] {
+                width: 150px;
+                font-size: 14px;
+            }
+            .controls button {
+                font-size: 14px;
+                padding: 6px 14px;
+            }
+            .message {
+                font-size: 0.9em;
+            }
         }
-
-        .welcome-section h2 {
-            font-size: 1.8em;
-            color: #333;
-            margin-bottom: 20px;
-        }
-
-        .button-container {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-        }
-
-        .button-container a {
-            text-decoration: none;
-        }
-
-        .button-container button {
-            padding: 10px 20px;
-            font-size: 16px;
-            color: #fff;
-            background-color: #4a4a8a;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .button-container button:hover {
-            background-color: #3a3a6a;
-        }
-
     </style>
 </head>
 <body>
@@ -168,19 +162,8 @@
 
 <div class="message" id="message">Guess the 6-letter word!</div>
 
-<!-- New Welcome Section -->
-<div class="welcome-section">
-    <h2>Welcome to Sponsor Party</h2>
-    <div class="button-container">
-        <a href="https://justfeldman.github.io/sponsors/getsponsor.html" target="_blank">
-            <button>Get Sponsored</button>
-        </a>
-        <button>Become a Sponsor</button>
-    </div>
-</div>
-
 <script>
-    const correctWord = "SPRING";  // Set the answer to "SPRING"
+    const correctWord = "QUARTZ";  // Changed answer to a harder word
     const maxGuesses = 6;
     let currentGuess = 0;
 
