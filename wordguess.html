@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sponsor Party</title> <!-- Updated title -->
+    <title>Sponsor Party</title>
     <style>
         /* General Styling */
         body {
@@ -11,24 +11,25 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
             min-height: 100vh;
             margin: 0;
             background-color: #f5f5f5;
             color: #333;
-            padding-top: 20px;
+            padding: 20px;
+            box-sizing: border-box;
         }
 
         /* Sponsor Logo */
         .sponsor-logo {
-            width: 180px; /* Increased size */
-            height: 180px; /* Increased size */
+            width: 180px;
+            height: 180px;
             border-radius: 50%;
-            background-image: url('sponsorlogo2.png'); /* Ensure this path is correct */
+            background-image: url('sponsorlogo2.png');
             background-size: cover;
             background-position: center;
             margin-bottom: 20px;
-            border: 6px solid #333; /* Slightly thicker border for emphasis */
+            border: 6px solid #333;
         }
 
         /* Wordle Header and Grid */
@@ -108,6 +109,40 @@
             color: #333;
             text-align: center;
         }
+
+        /* New Section - Welcome and Buttons */
+        .welcome-section {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .welcome-section h2 {
+            font-size: 1.8em;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .button-container button {
+            padding: 10px 20px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #4a4a8a;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .button-container button:hover {
+            background-color: #3a3a6a;
+        }
+
     </style>
 </head>
 <body>
@@ -128,6 +163,15 @@
 </div>
 
 <div class="message" id="message">Guess the 6-letter word!</div>
+
+<!-- New Welcome Section -->
+<div class="welcome-section">
+    <h2>Welcome to Sponsor Party</h2>
+    <div class="button-container">
+        <button>Get Sponsored</button>
+        <button>Become a Sponsor</button>
+    </div>
+</div>
 
 <script>
     const correctWord = "SPRING";  // Set the answer to "SPRING"
