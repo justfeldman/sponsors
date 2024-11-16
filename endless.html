@@ -1,39 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Endless Runner</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: #222;
-      color: white;
-      text-align: center;
-    }
-    canvas {
-      display: block;
-      margin: 20px auto;
-      background: linear-gradient(to bottom, #87ceeb, #1e90ff);
-      border: 2px solid white;
-    }
-  </style>
-</head>
-<body>
-  <h1>Endless Runner</h1>
-  <p>Press Space to Jump</p>
-  <canvas id="gameCanvas" width="800" height="400"></canvas>
-  <script>
+<script>
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
 
     // Game variables
-    let player = { x: 50, y: 350, width: 30, height: 30, dy: 0, jumping: false };
+    let player = { x: 50, y: 350, width: 30, height: 30, dy: 0, jumping: false, invincible: false };
     let obstacles = [];
+    let powerUps = [];
     let score = 0;
     let gameSpeed = 3;
-    let gameOver = false;
+
+    // Retrieve high score from localStorage
+    let highScore = localStorage.getItem("highScore") || 0;
 
     // Keyboard controls
     window.addEventListener("keydown", (e) => {
@@ -50,10 +27,26 @@
     }
     setInterval(spawnObstacle, 2000); // Spawn obstacles every 2 seconds
 
+    // Create power-ups
+    function spawnPowerUp() {
+      const powerUp = {
+        x: Math.random() * (canvas.width - 50) + 50, // Random x position
+        y: Math.random() * (canvas.height - 100) + 50, // Random y position
+        width: 20,
+        height: 20,
+        type: Math.random() < 0.5 ? "score" : "invincible" // Random type: score or invincibility
+      };
+      powerUps.push(powerUp);
+    }
+    setInterval(spawnPowerUp, 5000); // Spawn power-ups every 5 seconds
+
+    // Reset player invincibility
+    function removeInvincibility() {
+      player.invincible = false;
+    }
+
     // Update game state
     function update() {
-      if (gameOver) return;
-
       // Update player
       if (player.jumping) {
         player.dy += 0.5; // Gravity
@@ -72,19 +65,50 @@
           obstacles.splice(i, 1); // Remove off-screen obstacles
           score += 10; // Increase score
         }
-        // Check collision
+
+        // Collision logic with obstacles
         if (
+          !player.invincible &&
           player.x < obstacles[i].x + obstacles[i].width &&
           player.x + player.width > obstacles[i].x &&
           player.y < obstacles[i].y + obstacles[i].height &&
           player.y + player.height > obstacles[i].y
         ) {
-          gameOver = true;
+          score -= 5; // Lose points on collision
+          score = Math.max(score, 0); // Prevent negative score
+        }
+      }
+
+      // Update power-ups
+      for (let i = powerUps.length - 1; i >= 0; i--) {
+        const powerUp = powerUps[i];
+
+        // Check collision with player
+        if (
+          player.x < powerUp.x + powerUp.width &&
+          player.x + player.width > powerUp.x &&
+          player.y < powerUp.y + powerUp.height &&
+          player.y + player.height > powerUp.y
+        ) {
+          if (powerUp.type === "score") {
+            score += 50; // Add bonus points
+          } else if (powerUp.type === "invincible") {
+            player.invincible = true; // Make player invincible
+            setTimeout(removeInvincibility, 3000); // Invincibility lasts for 3 seconds
+          }
+
+          powerUps.splice(i, 1); // Remove the power-up
         }
       }
 
       // Increase game speed over time
       gameSpeed += 0.001;
+
+      // Update high score
+      if (score > highScore) {
+        highScore = score;
+        localStorage.setItem("highScore", highScore); // Save to localStorage
+      }
     }
 
     // Draw game objects
@@ -93,7 +117,7 @@
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       // Draw player
-      ctx.fillStyle = "red";
+      ctx.fillStyle = player.invincible ? "yellow" : "red"; // Yellow if invincible
       ctx.fillRect(player.x, player.y, player.width, player.height);
 
       // Draw obstacles
@@ -102,27 +126,25 @@
         ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
       }
 
-      // Draw score
+      // Draw power-ups
+      for (const powerUp of powerUps) {
+        ctx.fillStyle = powerUp.type === "score" ? "green" : "blue"; // Green for score, blue for invincibility
+        ctx.fillRect(powerUp.x, powerUp.y, powerUp.width, powerUp.height);
+      }
+
+      // Draw score and high score
       ctx.fillStyle = "white";
       ctx.font = "20px Arial";
       ctx.fillText(`Score: ${score}`, 10, 30);
-
-      // Draw Game Over message
-      if (gameOver) {
-        ctx.fillStyle = "white";
-        ctx.font = "40px Arial";
-        ctx.fillText("Game Over!", canvas.width / 2 - 100, canvas.height / 2);
-      }
+      ctx.fillText(`High Score: ${highScore}`, 10, 60);
     }
 
     // Game loop
     function gameLoop() {
       update();
       draw();
-      if (!gameOver) requestAnimationFrame(gameLoop);
+      requestAnimationFrame(gameLoop);
     }
 
     gameLoop();
-  </script>
-</body>
-</html>
+</script>
