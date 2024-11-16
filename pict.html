@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pictionary Lite</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #333;
+      color: white;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+    canvas {
+      display: block;
+      margin: 20px auto;
+      background: white;
+      border: 2px solid black;
+    }
+    .controls {
+      margin-top: 20px;
+    }
+    .guesses {
+      margin-top: 20px;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Pictionary Lite</h1>
+  <p>Draw and Guess! Drawer can't speak, only draw!</p>
+  <p>Timer: <span id="timer">30</span> seconds</p>
+  <canvas id="drawingCanvas" width="800" height="400"></canvas>
+  <div class="controls">
+    <input type="text" id="guessInput" placeholder="Enter your guess here!" />
+    <button id="submitGuess">Submit Guess</button>
+  </div>
+  <div class="guesses" id="guessList"></div>
+  <script>
+    const canvas = document.getElementById("drawingCanvas");
+    const ctx = canvas.getContext("2d");
+    const timerElement = document.getElementById("timer");
+    const guessInput = document.getElementById("guessInput");
+    const submitGuess = document.getElementById("submitGuess");
+    const guessList = document.getElementById("guessList");
+
+    // Random words for the game
+    const words = ["Dog", "Pizza", "Rocket", "Elephant", "Banana", "Zombie", "Dragon", "Laptop", "Superman"];
+    let currentWord = words[Math.floor(Math.random() * words.length)];
+    let timeLeft = 30;
+    let isGameOver = false;
+
+    // Drawing variables
+    let isDrawing = false;
+
+    // Timer countdown
+    function startTimer() {
+      const timerInterval = setInterval(() => {
+        if (isGameOver) {
+          clearInterval(timerInterval);
+        } else if (timeLeft > 0) {
+          timeLeft--;
+          timerElement.textContent = timeLeft;
+        } else {
+          clearInterval(timerInterval);
+          isGameOver = true;
+          alert(`Time's up! The word was "${currentWord}".`);
+          resetGame();
+        }
+      }, 1000);
+    }
+
+    // Start drawing on canvas
+    canvas.addEventListener("mousedown", () => {
+      isDrawing = true;
+      ctx.beginPath();
+    });
+
+    canvas.addEventListener("mouseup", () => {
+      isDrawing = false;
+    });
+
+    canvas.addEventListener("mousemove", (event) => {
+      if (isDrawing) {
+        const rect = canvas.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        ctx.lineWidth = 5;
+        ctx.lineCap = "round";
+        ctx.strokeStyle = "black";
+        ctx.lineTo(x, y);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+      }
+    });
+
+    // Submit a guess
+    submitGuess.addEventListener("click", () => {
+      if (isGameOver) return;
+
+      const guess = guessInput.value.trim();
+      if (guess) {
+        if (guess.toLowerCase() === currentWord.toLowerCase()) {
+          alert(`Correct! The word was "${currentWord}".`);
+          isGameOver = true;
+          resetGame();
+        } else {
+          const wrongGuess = document.createElement("div");
+          wrongGuess.textContent = `Wrong guess: "${guess}"`;
+          guessList.appendChild(wrongGuess);
+          guessInput.value = "";
+        }
+      }
+    });
+
+    // Reset the game
+    function resetGame() {
+      currentWord = words[Math.floor(Math.random() * words.length)];
+      timeLeft = 30;
+      isGameOver = false;
+      timerElement.textContent = timeLeft;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      guessList.innerHTML = "";
+      startTimer();
+    }
+
+    // Start the game
+    alert(`The word to draw is: "${currentWord}".`);
+    startTimer();
+  </script>
+</body>
+</html>
