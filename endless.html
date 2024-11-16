@@ -3,36 +3,40 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Level-Based Shooter</title>
+  <title>Strategy Game</title>
   <style>
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background-color: #222;
-      color: white;
       text-align: center;
+      background-color: #333;
+      color: white;
     }
     canvas {
       display: block;
       margin: 20px auto;
-      background: #333;
+      background: #222;
       border: 2px solid white;
     }
   </style>
 </head>
 <body>
-  <h1>Level-Based Shooter</h1>
-  <canvas id="gameCanvas" width="800" height="400"></canvas>
+  <h1>Simple Strategy Game</h1>
+  <p>Use Arrow Keys to Move and Expand</p>
+  <canvas id="gameCanvas" width="800" height="600"></canvas>
   <script>
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
 
     // Game variables
-    let player = { x: 50, y: 180, width: 30, height: 30, health: 100, speed: 5 };
-    let bullets = [];
-    let enemies = [];
-    let level = 1;
-    let score = 0;
+    const gridSize = 20; // Size of each grid tile
+    const rows = canvas.height / gridSize;
+    const cols = canvas.width / gridSize;
+    const grid = Array.from({ length: rows }, () => Array(cols).fill(0)); // 0 = empty, 1 = player, 2 = enemy territory
+
+    let player = { x: 10, y: 15, health: 100, score: 0 };
+    let enemies = [{ x: 30, y: 15, dx: -1, dy: 0 }]; // Enemy starts moving left
+    let winCondition = 50; // Number of tiles to win
     let gameOver = false;
 
     // Keyboard controls
@@ -40,143 +44,92 @@
     window.addEventListener("keydown", (e) => keys[e.key] = true);
     window.addEventListener("keyup", (e) => keys[e.key] = false);
 
-    // Spawn enemies
-    function spawnEnemies() {
-      for (let i = 0; i < level * 2; i++) {
-        enemies.push({
-          x: Math.random() * (canvas.width - 100) + 100,
-          y: Math.random() * canvas.height,
-          width: 30,
-          height: 30,
-          speed: Math.random() * 2 + 1,
-        });
-      }
-    }
-
-    // Shoot bullets
-    function shootBullet() {
-      bullets.push({
-        x: player.x + player.width,
-        y: player.y + player.height / 2 - 5,
-        width: 10,
-        height: 5,
-        speed: 7,
-      });
-    }
-
-    // Reset game
-    function resetGame() {
-      player.health = 100;
-      bullets = [];
-      enemies = [];
-      level = 1;
-      score = 0;
-      gameOver = false;
-      spawnEnemies();
-    }
-
-    // Update game objects
-    function update() {
-      if (gameOver) return;
-
-      // Player movement
-      if (keys["ArrowUp"] && player.y > 0) player.y -= player.speed;
-      if (keys["ArrowDown"] && player.y < canvas.height - player.height) player.y += player.speed;
-      if (keys[" "] && bullets.length < 5) { // Space to shoot
-        shootBullet();
-      }
-
-      // Update bullets
-      for (let i = bullets.length - 1; i >= 0; i--) {
-        bullets[i].x += bullets[i].speed;
-        if (bullets[i].x > canvas.width) {
-          bullets.splice(i, 1);
+    // Draw the grid
+    function drawGrid() {
+      for (let y = 0; y < rows; y++) {
+        for (let x = 0; x < cols; x++) {
+          if (grid[y][x] === 1) ctx.fillStyle = "green"; // Player territory
+          else if (grid[y][x] === 2) ctx.fillStyle = "red"; // Enemy territory
+          else ctx.fillStyle = "black"; // Empty
+          ctx.fillRect(x * gridSize, y * gridSize, gridSize - 1, gridSize - 1);
         }
       }
+    }
 
-      // Update enemies
-      for (let i = enemies.length - 1; i >= 0; i--) {
-        const enemy = enemies[i];
-        enemy.x -= enemy.speed;
+    // Move the player
+    function movePlayer() {
+      if (keys["ArrowUp"] && player.y > 0) player.y--;
+      if (keys["ArrowDown"] && player.y < rows - 1) player.y++;
+      if (keys["ArrowLeft"] && player.x > 0) player.x--;
+      if (keys["ArrowRight"] && player.x < cols - 1) player.x++;
 
-        // Check collision with player
-        if (
-          player.x < enemy.x + enemy.width &&
-          player.x + player.width > enemy.x &&
-          player.y < enemy.y + enemy.height &&
-          player.y + player.height > enemy.y
-        ) {
-          player.health -= 10;
-          enemies.splice(i, 1);
+      // Expand territory
+      if (grid[player.y][player.x] === 0) {
+        grid[player.y][player.x] = 1;
+        player.score++;
+      }
+    }
+
+    // Move enemies
+    function moveEnemies() {
+      enemies.forEach((enemy) => {
+        // Random movement
+        const direction = Math.random();
+        if (direction < 0.25 && enemy.y > 0) enemy.y--; // Up
+        else if (direction < 0.5 && enemy.y < rows - 1) enemy.y++; // Down
+        else if (direction < 0.75 && enemy.x > 0) enemy.x--; // Left
+        else if (enemy.x < cols - 1) enemy.x++; // Right
+
+        // Enemy claims territory
+        if (grid[enemy.y][enemy.x] === 0) {
+          grid[enemy.y][enemy.x] = 2;
+        }
+
+        // Check collision with player territory
+        if (grid[enemy.y][enemy.x] === 1) {
+          player.health -= 5;
           if (player.health <= 0) {
             gameOver = true;
-            alert("Game Over! Press OK to restart.");
-            resetGame();
+            alert("Game Over! You lost.");
           }
         }
-
-        // Check collision with bullets
-        for (let j = bullets.length - 1; j >= 0; j--) {
-          const bullet = bullets[j];
-          if (
-            bullet.x < enemy.x + enemy.width &&
-            bullet.x + bullet.width > enemy.x &&
-            bullet.y < enemy.y + enemy.height &&
-            bullet.y + bullet.height > enemy.y
-          ) {
-            bullets.splice(j, 1);
-            enemies.splice(i, 1);
-            score += 10;
-            break;
-          }
-        }
-      }
-
-      // Check if level is complete
-      if (enemies.length === 0) {
-        level++;
-        spawnEnemies();
-      }
+      });
     }
 
-    // Draw game objects
-    function draw() {
-      // Clear canvas
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // Draw player
-      ctx.fillStyle = "green";
-      ctx.fillRect(player.x, player.y, player.width, player.height);
-
-      // Draw bullets
-      ctx.fillStyle = "yellow";
-      bullets.forEach((bullet) => {
-        ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
-      });
-
-      // Draw enemies
-      ctx.fillStyle = "red";
-      enemies.forEach((enemy) => {
-        ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
-      });
-
-      // Draw health and score
-      ctx.fillStyle = "white";
-      ctx.font = "20px Arial";
-      ctx.fillText(`Health: ${player.health}`, 10, 30);
-      ctx.fillText(`Score: ${score}`, 10, 60);
-      ctx.fillText(`Level: ${level}`, 10, 90);
+    // Check win condition
+    function checkWin() {
+      if (player.score >= winCondition) {
+        gameOver = true;
+        alert("Congratulations! You won!");
+      }
     }
 
     // Game loop
     function gameLoop() {
-      update();
-      draw();
+      if (gameOver) return;
+
+      movePlayer();
+      moveEnemies();
+      checkWin();
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawGrid();
+
+      // Draw player
+      ctx.fillStyle = "blue";
+      ctx.fillRect(player.x * gridSize, player.y * gridSize, gridSize - 1, gridSize - 1);
+
+      // Draw health and score
+      ctx.fillStyle = "white";
+      ctx.font = "20px Arial";
+      ctx.fillText(`Health: ${player.health}`, 10, 20);
+      ctx.fillText(`Score: ${player.score}`, 10, 50);
+      ctx.fillText(`Expand to ${winCondition} tiles to win`, 10, 80);
+
       requestAnimationFrame(gameLoop);
     }
 
-    spawnEnemies(); // Start by spawning enemies
-    gameLoop(); // Start the game loop
+    gameLoop();
   </script>
 </body>
 </html>
