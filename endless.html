@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Endless Runner</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #222;
+      color: white;
+      text-align: center;
+    }
+    canvas {
+      display: block;
+      margin: 20px auto;
+      background: linear-gradient(to bottom, #87ceeb, #1e90ff);
+      border: 2px solid white;
+    }
+  </style>
+</head>
+<body>
+  <h1>Endless Runner</h1>
+  <p>Press Space to Jump</p>
+  <canvas id="gameCanvas" width="800" height="400"></canvas>
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    // Game variables
+    let player = { x: 50, y: 350, width: 30, height: 30, dy: 0, jumping: false };
+    let obstacles = [];
+    let score = 0;
+    let gameSpeed = 3;
+    let gameOver = false;
+
+    // Keyboard controls
+    window.addEventListener("keydown", (e) => {
+      if (e.code === "Space" && !player.jumping) {
+        player.jumping = true;
+        player.dy = -10; // Jump force
+      }
+    });
+
+    // Create obstacles
+    function spawnObstacle() {
+      const obstacle = { x: canvas.width, y: 350, width: 30, height: 30 };
+      obstacles.push(obstacle);
+    }
+    setInterval(spawnObstacle, 2000); // Spawn obstacles every 2 seconds
+
+    // Update game state
+    function update() {
+      if (gameOver) return;
+
+      // Update player
+      if (player.jumping) {
+        player.dy += 0.5; // Gravity
+        player.y += player.dy;
+        if (player.y >= 350) {
+          player.y = 350;
+          player.jumping = false;
+          player.dy = 0;
+        }
+      }
+
+      // Update obstacles
+      for (let i = obstacles.length - 1; i >= 0; i--) {
+        obstacles[i].x -= gameSpeed;
+        if (obstacles[i].x + obstacles[i].width < 0) {
+          obstacles.splice(i, 1); // Remove off-screen obstacles
+          score += 10; // Increase score
+        }
+        // Check collision
+        if (
+          player.x < obstacles[i].x + obstacles[i].width &&
+          player.x + player.width > obstacles[i].x &&
+          player.y < obstacles[i].y + obstacles[i].height &&
+          player.y + player.height > obstacles[i].y
+        ) {
+          gameOver = true;
+        }
+      }
+
+      // Increase game speed over time
+      gameSpeed += 0.001;
+    }
+
+    // Draw game objects
+    function draw() {
+      // Clear canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw player
+      ctx.fillStyle = "red";
+      ctx.fillRect(player.x, player.y, player.width, player.height);
+
+      // Draw obstacles
+      ctx.fillStyle = "black";
+      for (const obstacle of obstacles) {
+        ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+      }
+
+      // Draw score
+      ctx.fillStyle = "white";
+      ctx.font = "20px Arial";
+      ctx.fillText(`Score: ${score}`, 10, 30);
+
+      // Draw Game Over message
+      if (gameOver) {
+        ctx.fillStyle = "white";
+        ctx.font = "40px Arial";
+        ctx.fillText("Game Over!", canvas.width / 2 - 100, canvas.height / 2);
+      }
+    }
+
+    // Game loop
+    function gameLoop() {
+      update();
+      draw();
+      if (!gameOver) requestAnimationFrame(gameLoop);
+    }
+
+    gameLoop();
+  </script>
+</body>
+</html>
