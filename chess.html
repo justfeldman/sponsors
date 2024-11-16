@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple Chess Platform</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #333;
+      color: white;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+    }
+    #chessboard {
+      display: grid;
+      grid-template-columns: repeat(8, 50px);
+      grid-template-rows: repeat(8, 50px);
+      margin: 20px auto;
+      border: 2px solid white;
+    }
+    .square {
+      width: 50px;
+      height: 50px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 24px;
+    }
+    .white {
+      background-color: #eee;
+    }
+    .black {
+      background-color: #333;
+    }
+    .highlight {
+      background-color: yellow;
+    }
+  </style>
+</head>
+<body>
+  <h1>Simple Chess Platform</h1>
+  <div id="chessboard"></div>
+  <p id="message">Player 1's Turn</p>
+
+  <script>
+    // Chessboard setup
+    const boardState = [
+      ["r", "n", "b", "q", "k", "b", "n", "r"],
+      ["p", "p", "p", "p", "p", "p", "p", "p"],
+      ["", "", "", "", "", "", "", ""],
+      ["", "", "", "", "", "", "", ""],
+      ["", "", "", "", "", "", "", ""],
+      ["", "", "", "", "", "", "", ""],
+      ["P", "P", "P", "P", "P", "P", "P", "P"],
+      ["R", "N", "B", "Q", "K", "B", "N", "R"],
+    ];
+
+    const pieces = {
+      "P": "♙", "p": "♟",
+      "R": "♖", "r": "♜",
+      "N": "♘", "n": "♞",
+      "B": "♗", "b": "♝",
+      "Q": "♕", "q": "♛",
+      "K": "♔", "k": "♚",
+    };
+
+    const chessboard = document.getElementById("chessboard");
+    const message = document.getElementById("message");
+
+    let selectedPiece = null;
+    let currentPlayer = "white"; // Player 1 starts
+
+    // Render the chessboard
+    function renderBoard() {
+      chessboard.innerHTML = ""; // Clear the board
+      boardState.forEach((row, y) => {
+        row.forEach((cell, x) => {
+          const square = document.createElement("div");
+          square.classList.add("square");
+          square.classList.add((x + y) % 2 === 0 ? "white" : "black");
+          square.dataset.x = x;
+          square.dataset.y = y;
+
+          if (cell) square.textContent = pieces[cell];
+
+          square.addEventListener("click", () => handleSquareClick(x, y, square));
+          chessboard.appendChild(square);
+        });
+      });
+    }
+
+    // Handle square clicks
+    function handleSquareClick(x, y, square) {
+      if (selectedPiece) {
+        // Move the piece if a square is selected
+        const [sx, sy] = selectedPiece;
+        const piece = boardState[sy][sx];
+        
+        if (isValidMove(sx, sy, x, y, piece)) {
+          boardState[sy][sx] = ""; // Remove piece from old square
+          boardState[y][x] = piece; // Place piece on new square
+          currentPlayer = currentPlayer === "white" ? "black" : "white";
+          message.textContent = `${currentPlayer === "white" ? "Player 1" : "Player 2"}'s Turn`;
+        }
+
+        selectedPiece = null; // Deselect piece
+        renderBoard(); // Re-render board
+      } else if (boardState[y][x] && isCurrentPlayerPiece(boardState[y][x])) {
+        // Select the piece
+        selectedPiece = [x, y];
+        highlightSquare(square);
+      }
+    }
+
+    // Highlight the selected square
+    function highlightSquare(square) {
+      document.querySelectorAll(".square").forEach((sq) => sq.classList.remove("highlight"));
+      square.classList.add("highlight");
+    }
+
+    // Check if the piece belongs to the current player
+    function isCurrentPlayerPiece(piece) {
+      return currentPlayer === "white" ? piece === piece.toUpperCase() : piece === piece.toLowerCase();
+    }
+
+    // Validate moves (basic rules for now)
+    function isValidMove(sx, sy, x, y, piece) {
+      // Add more rules here for valid moves
+      if (piece.toLowerCase() === "p") {
+        // Pawn basic move (no captures or en passant yet)
+        const direction = piece === "P" ? -1 : 1; // White moves up, black moves down
+        return x === sx && y === sy + direction && !boardState[y][x];
+      }
+      // For now, allow all moves
+      return true;
+    }
+
+    // Initialize the game
+    renderBoard();
+  </script>
+</body>
+</html>
