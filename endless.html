@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Strategy Game</title>
+  <title>1v1 Shooter with Cover</title>
   <style>
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      text-align: center;
       background-color: #333;
       color: white;
+      text-align: center;
     }
     canvas {
       display: block;
@@ -21,22 +21,20 @@
   </style>
 </head>
 <body>
-  <h1>Simple Strategy Game</h1>
-  <p>Use Arrow Keys to Move and Expand</p>
-  <canvas id="gameCanvas" width="800" height="600"></canvas>
+  <h1>1v1 Shooter Mode</h1>
+  <p>Player 1: W, A, S, D to Move, F to Shoot | Player 2: Arrow Keys to Move, Enter to Shoot</p>
+  <canvas id="gameCanvas" width="800" height="400"></canvas>
   <script>
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
 
     // Game variables
-    const gridSize = 20; // Size of each grid tile
-    const rows = canvas.height / gridSize;
-    const cols = canvas.width / gridSize;
-    const grid = Array.from({ length: rows }, () => Array(cols).fill(0)); // 0 = empty, 1 = player, 2 = enemy territory
-
-    let player = { x: 10, y: 15, health: 100, score: 0 };
-    let enemies = [{ x: 30, y: 15, dx: -1, dy: 0 }]; // Enemy starts moving left
-    let winCondition = 50; // Number of tiles to win
+    const player1 = { x: 50, y: 200, width: 30, height: 30, health: 100, speed: 5, bullets: [] };
+    const player2 = { x: 700, y: 200, width: 30, height: 30, health: 100, speed: 5, bullets: [] };
+    const obstacles = [
+      { x: 300, y: 150, width: 50, height: 100 }, // Obstacle 1
+      { x: 500, y: 150, width: 50, height: 100 }, // Obstacle 2
+    ];
     let gameOver = false;
 
     // Keyboard controls
@@ -44,92 +42,148 @@
     window.addEventListener("keydown", (e) => keys[e.key] = true);
     window.addEventListener("keyup", (e) => keys[e.key] = false);
 
-    // Draw the grid
-    function drawGrid() {
-      for (let y = 0; y < rows; y++) {
-        for (let x = 0; x < cols; x++) {
-          if (grid[y][x] === 1) ctx.fillStyle = "green"; // Player territory
-          else if (grid[y][x] === 2) ctx.fillStyle = "red"; // Enemy territory
-          else ctx.fillStyle = "black"; // Empty
-          ctx.fillRect(x * gridSize, y * gridSize, gridSize - 1, gridSize - 1);
-        }
-      }
-    }
-
-    // Move the player
-    function movePlayer() {
-      if (keys["ArrowUp"] && player.y > 0) player.y--;
-      if (keys["ArrowDown"] && player.y < rows - 1) player.y++;
-      if (keys["ArrowLeft"] && player.x > 0) player.x--;
-      if (keys["ArrowRight"] && player.x < cols - 1) player.x++;
-
-      // Expand territory
-      if (grid[player.y][player.x] === 0) {
-        grid[player.y][player.x] = 1;
-        player.score++;
-      }
-    }
-
-    // Move enemies
-    function moveEnemies() {
-      enemies.forEach((enemy) => {
-        // Random movement
-        const direction = Math.random();
-        if (direction < 0.25 && enemy.y > 0) enemy.y--; // Up
-        else if (direction < 0.5 && enemy.y < rows - 1) enemy.y++; // Down
-        else if (direction < 0.75 && enemy.x > 0) enemy.x--; // Left
-        else if (enemy.x < cols - 1) enemy.x++; // Right
-
-        // Enemy claims territory
-        if (grid[enemy.y][enemy.x] === 0) {
-          grid[enemy.y][enemy.x] = 2;
-        }
-
-        // Check collision with player territory
-        if (grid[enemy.y][enemy.x] === 1) {
-          player.health -= 5;
-          if (player.health <= 0) {
-            gameOver = true;
-            alert("Game Over! You lost.");
-          }
-        }
+    // Shoot bullets
+    function shootBullet(player) {
+      player.bullets.push({
+        x: player === player1 ? player.x + player.width : player.x - 10,
+        y: player.y + player.height / 2 - 5,
+        width: 10,
+        height: 5,
+        speed: player === player1 ? 7 : -7, // Direction based on player
       });
     }
 
-    // Check win condition
-    function checkWin() {
-      if (player.score >= winCondition) {
-        gameOver = true;
-        alert("Congratulations! You won!");
+    // Reset the game
+    function resetGame() {
+      player1.x = 50;
+      player1.y = 200;
+      player1.health = 100;
+      player1.bullets = [];
+      player2.x = 700;
+      player2.y = 200;
+      player2.health = 100;
+      player2.bullets = [];
+      gameOver = false;
+    }
+
+    // Check collisions with obstacles
+    function checkObstacleCollision(obj) {
+      for (const obstacle of obstacles) {
+        if (
+          obj.x < obstacle.x + obstacle.width &&
+          obj.x + obj.width > obstacle.x &&
+          obj.y < obstacle.y + obstacle.height &&
+          obj.y + obj.height > obstacle.y
+        ) {
+          return true; // Colliding with an obstacle
+        }
       }
+      return false;
+    }
+
+    // Update game objects
+    function update() {
+      if (gameOver) return;
+
+      // Player 1 movement
+      if (keys["w"] && player1.y > 0) player1.y -= player1.speed;
+      if (keys["s"] && player1.y < canvas.height - player1.height) player1.y += player1.speed;
+      if (keys["a"] && player1.x > 0) player1.x -= player1.speed;
+      if (keys["d"] && player1.x < canvas.width - player1.width) player1.x += player1.speed;
+      if (keys["f"]) {
+        shootBullet(player1);
+        keys["f"] = false; // Prevent holding the key
+      }
+
+      // Player 2 movement
+      if (keys["ArrowUp"] && player2.y > 0) player2.y -= player2.speed;
+      if (keys["ArrowDown"] && player2.y < canvas.height - player2.height) player2.y += player2.speed;
+      if (keys["ArrowLeft"] && player2.x > 0) player2.x -= player2.speed;
+      if (keys["ArrowRight"] && player2.x < canvas.width - player2.width) player2.x += player2.speed;
+      if (keys["Enter"]) {
+        shootBullet(player2);
+        keys["Enter"] = false; // Prevent holding the key
+      }
+
+      // Update bullets
+      for (const player of [player1, player2]) {
+        for (let i = player.bullets.length - 1; i >= 0; i--) {
+          const bullet = player.bullets[i];
+          bullet.x += bullet.speed;
+
+          // Remove bullets that hit obstacles
+          if (checkObstacleCollision(bullet)) {
+            player.bullets.splice(i, 1);
+            continue;
+          }
+
+          // Remove off-screen bullets
+          if (bullet.x < 0 || bullet.x > canvas.width) {
+            player.bullets.splice(i, 1);
+            continue;
+          }
+
+          // Check if bullet hits the other player
+          const target = player === player1 ? player2 : player1;
+          if (
+            bullet.x < target.x + target.width &&
+            bullet.x + bullet.width > target.x &&
+            bullet.y < target.y + target.height &&
+            bullet.y + bullet.height > target.y
+          ) {
+            target.health -= 10;
+            player.bullets.splice(i, 1);
+
+            if (target.health <= 0) {
+              gameOver = true;
+              alert(`${player === player1 ? "Player 1" : "Player 2"} Wins! Press OK to restart.`);
+              resetGame();
+            }
+          }
+        }
+      }
+    }
+
+    // Draw game objects
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw players
+      ctx.fillStyle = "green";
+      ctx.fillRect(player1.x, player1.y, player1.width, player1.height);
+      ctx.fillStyle = "blue";
+      ctx.fillRect(player2.x, player2.y, player2.width, player2.height);
+
+      // Draw bullets
+      ctx.fillStyle = "yellow";
+      player1.bullets.forEach((bullet) => {
+        ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
+      });
+      player2.bullets.forEach((bullet) => {
+        ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
+      });
+
+      // Draw obstacles
+      ctx.fillStyle = "gray";
+      obstacles.forEach((obstacle) => {
+        ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+      });
+
+      // Draw health
+      ctx.fillStyle = "white";
+      ctx.font = "20px Arial";
+      ctx.fillText(`Player 1 Health: ${player1.health}`, 10, 30);
+      ctx.fillText(`Player 2 Health: ${player2.health}`, 600, 30);
     }
 
     // Game loop
     function gameLoop() {
-      if (gameOver) return;
-
-      movePlayer();
-      moveEnemies();
-      checkWin();
-
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      drawGrid();
-
-      // Draw player
-      ctx.fillStyle = "blue";
-      ctx.fillRect(player.x * gridSize, player.y * gridSize, gridSize - 1, gridSize - 1);
-
-      // Draw health and score
-      ctx.fillStyle = "white";
-      ctx.font = "20px Arial";
-      ctx.fillText(`Health: ${player.health}`, 10, 20);
-      ctx.fillText(`Score: ${player.score}`, 10, 50);
-      ctx.fillText(`Expand to ${winCondition} tiles to win`, 10, 80);
-
+      update();
+      draw();
       requestAnimationFrame(gameLoop);
     }
 
-    gameLoop();
+    gameLoop(); // Start the game loop
   </script>
 </body>
 </html>
