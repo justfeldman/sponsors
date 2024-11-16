@@ -3,112 +3,98 @@
     const ctx = canvas.getContext("2d");
 
     // Game variables
-    let player = { x: 50, y: 350, width: 30, height: 30, dy: 0, jumping: false, invincible: false };
-    let obstacles = [];
-    let powerUps = [];
-    let score = 0;
-    let gameSpeed = 3;
-
-    // Retrieve high score from localStorage
-    let highScore = localStorage.getItem("highScore") || 0;
+    const players = [
+      { x: 100, y: 350, width: 30, height: 30, color: "red", health: 100, keys: { left: "a", right: "d", up: "w", attack: " " } },
+      { x: 700, y: 350, width: 30, height: 30, color: "blue", health: 100, keys: { left: "ArrowLeft", right: "ArrowRight", up: "ArrowUp", attack: "Enter" } },
+    ];
+    const attacks = []; // Store active attacks
 
     // Keyboard controls
-    window.addEventListener("keydown", (e) => {
-      if (e.code === "Space" && !player.jumping) {
-        player.jumping = true;
-        player.dy = -10; // Jump force
+    const keys = {};
+    window.addEventListener("keydown", (e) => keys[e.key] = true);
+    window.addEventListener("keyup", (e) => keys[e.key] = false);
+
+    // Handle attacks
+    function attack(playerIndex) {
+      const player = players[playerIndex];
+      attacks.push({
+        x: player.x + (playerIndex === 0 ? player.width : -10), // Attack direction
+        y: player.y + 10,
+        width: 10,
+        height: 10,
+        color: player.color,
+        playerIndex, // Track which player initiated the attack
+      });
+    }
+
+    // Check collisions
+    function checkCollisions() {
+      for (let i = attacks.length - 1; i >= 0; i--) {
+        const attack = attacks[i];
+
+        // Check if the attack hits an opposing player
+        players.forEach((player, index) => {
+          if (index !== attack.playerIndex) {
+            if (
+              attack.x < player.x + player.width &&
+              attack.x + attack.width > player.x &&
+              attack.y < player.y + player.height &&
+              attack.y + attack.height > player.y
+            ) {
+              // Reduce health
+              player.health -= 10;
+              attacks.splice(i, 1); // Remove the attack
+              if (player.health <= 0) {
+                alert(`Player ${attack.playerIndex + 1} Wins!`);
+                resetGame();
+              }
+            }
+          }
+        });
+
+        // Remove off-screen attacks
+        if (attack.x < 0 || attack.x > canvas.width) {
+          attacks.splice(i, 1);
+        }
       }
-    });
-
-    // Create obstacles
-    function spawnObstacle() {
-      const obstacle = { x: canvas.width, y: 350, width: 30, height: 30 };
-      obstacles.push(obstacle);
     }
-    setInterval(spawnObstacle, 2000); // Spawn obstacles every 2 seconds
 
-    // Create power-ups
-    function spawnPowerUp() {
-      const powerUp = {
-        x: Math.random() * (canvas.width - 50) + 50, // Random x position
-        y: Math.random() * (canvas.height - 100) + 50, // Random y position
-        width: 20,
-        height: 20,
-        type: Math.random() < 0.5 ? "score" : "invincible" // Random type: score or invincibility
-      };
-      powerUps.push(powerUp);
-    }
-    setInterval(spawnPowerUp, 5000); // Spawn power-ups every 5 seconds
-
-    // Reset player invincibility
-    function removeInvincibility() {
-      player.invincible = false;
+    // Reset the game
+    function resetGame() {
+      players[0].x = 100;
+      players[0].health = 100;
+      players[1].x = 700;
+      players[1].health = 100;
+      attacks.length = 0;
     }
 
     // Update game state
     function update() {
-      // Update player
-      if (player.jumping) {
-        player.dy += 0.5; // Gravity
-        player.y += player.dy;
-        if (player.y >= 350) {
-          player.y = 350;
-          player.jumping = false;
-          player.dy = 0;
-        }
-      }
+      players.forEach((player, index) => {
+        // Movement
+        if (keys[player.keys.left]) player.x -= 3;
+        if (keys[player.keys.right]) player.x += 3;
+        if (keys[player.keys.up] && player.y === 350) player.y -= 10; // Jump logic
 
-      // Update obstacles
-      for (let i = obstacles.length - 1; i >= 0; i--) {
-        obstacles[i].x -= gameSpeed;
-        if (obstacles[i].x + obstacles[i].width < 0) {
-          obstacles.splice(i, 1); // Remove off-screen obstacles
-          score += 10; // Increase score
+        // Gravity
+        if (player.y < 350) player.y += 5;
+
+        // Attack
+        if (keys[player.keys.attack]) {
+          attack(index);
+          keys[player.keys.attack] = false; // Prevent holding attack
         }
 
-        // Collision logic with obstacles
-        if (
-          !player.invincible &&
-          player.x < obstacles[i].x + obstacles[i].width &&
-          player.x + player.width > obstacles[i].x &&
-          player.y < obstacles[i].y + obstacles[i].height &&
-          player.y + player.height > obstacles[i].y
-        ) {
-          score -= 5; // Lose points on collision
-          score = Math.max(score, 0); // Prevent negative score
-        }
-      }
+        // Keep player within bounds
+        player.x = Math.max(0, Math.min(canvas.width - player.width, player.x));
+      });
 
-      // Update power-ups
-      for (let i = powerUps.length - 1; i >= 0; i--) {
-        const powerUp = powerUps[i];
+      // Update attacks
+      attacks.forEach((attack) => {
+        attack.x += attack.playerIndex === 0 ? 5 : -5; // Move attacks
+      });
 
-        // Check collision with player
-        if (
-          player.x < powerUp.x + powerUp.width &&
-          player.x + player.width > powerUp.x &&
-          player.y < powerUp.y + powerUp.height &&
-          player.y + player.height > powerUp.y
-        ) {
-          if (powerUp.type === "score") {
-            score += 50; // Add bonus points
-          } else if (powerUp.type === "invincible") {
-            player.invincible = true; // Make player invincible
-            setTimeout(removeInvincibility, 3000); // Invincibility lasts for 3 seconds
-          }
-
-          powerUps.splice(i, 1); // Remove the power-up
-        }
-      }
-
-      // Increase game speed over time
-      gameSpeed += 0.001;
-
-      // Update high score
-      if (score > highScore) {
-        highScore = score;
-        localStorage.setItem("highScore", highScore); // Save to localStorage
-      }
+      checkCollisions(); // Check for attack collisions
     }
 
     // Draw game objects
@@ -116,27 +102,21 @@
       // Clear canvas
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Draw player
-      ctx.fillStyle = player.invincible ? "yellow" : "red"; // Yellow if invincible
-      ctx.fillRect(player.x, player.y, player.width, player.height);
+      // Draw players
+      players.forEach((player) => {
+        ctx.fillStyle = player.color;
+        ctx.fillRect(player.x, player.y, player.width, player.height);
 
-      // Draw obstacles
-      ctx.fillStyle = "black";
-      for (const obstacle of obstacles) {
-        ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
-      }
+        // Draw health bar
+        ctx.fillStyle = "green";
+        ctx.fillRect(player.x, player.y - 10, (player.health / 100) * player.width, 5);
+      });
 
-      // Draw power-ups
-      for (const powerUp of powerUps) {
-        ctx.fillStyle = powerUp.type === "score" ? "green" : "blue"; // Green for score, blue for invincibility
-        ctx.fillRect(powerUp.x, powerUp.y, powerUp.width, powerUp.height);
-      }
-
-      // Draw score and high score
-      ctx.fillStyle = "white";
-      ctx.font = "20px Arial";
-      ctx.fillText(`Score: ${score}`, 10, 30);
-      ctx.fillText(`High Score: ${highScore}`, 10, 60);
+      // Draw attacks
+      attacks.forEach((attack) => {
+        ctx.fillStyle = attack.color;
+        ctx.fillRect(attack.x, attack.y, attack.width, attack.height);
+      });
     }
 
     // Game loop
