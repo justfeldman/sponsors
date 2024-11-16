@@ -1,100 +1,142 @@
-<script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Level-Based Shooter</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #222;
+      color: white;
+      text-align: center;
+    }
+    canvas {
+      display: block;
+      margin: 20px auto;
+      background: #333;
+      border: 2px solid white;
+    }
+  </style>
+</head>
+<body>
+  <h1>Level-Based Shooter</h1>
+  <canvas id="gameCanvas" width="800" height="400"></canvas>
+  <script>
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
 
     // Game variables
-    const players = [
-      { x: 100, y: 350, width: 30, height: 30, color: "red", health: 100, keys: { left: "a", right: "d", up: "w", attack: " " } },
-      { x: 700, y: 350, width: 30, height: 30, color: "blue", health: 100, keys: { left: "ArrowLeft", right: "ArrowRight", up: "ArrowUp", attack: "Enter" } },
-    ];
-    const attacks = []; // Store active attacks
+    let player = { x: 50, y: 180, width: 30, height: 30, health: 100, speed: 5 };
+    let bullets = [];
+    let enemies = [];
+    let level = 1;
+    let score = 0;
+    let gameOver = false;
 
     // Keyboard controls
     const keys = {};
     window.addEventListener("keydown", (e) => keys[e.key] = true);
     window.addEventListener("keyup", (e) => keys[e.key] = false);
 
-    // Handle attacks
-    function attack(playerIndex) {
-      const player = players[playerIndex];
-      attacks.push({
-        x: player.x + (playerIndex === 0 ? player.width : -10), // Attack direction
-        y: player.y + 10,
-        width: 10,
-        height: 10,
-        color: player.color,
-        playerIndex, // Track which player initiated the attack
-      });
-    }
-
-    // Check collisions
-    function checkCollisions() {
-      for (let i = attacks.length - 1; i >= 0; i--) {
-        const attack = attacks[i];
-
-        // Check if the attack hits an opposing player
-        players.forEach((player, index) => {
-          if (index !== attack.playerIndex) {
-            if (
-              attack.x < player.x + player.width &&
-              attack.x + attack.width > player.x &&
-              attack.y < player.y + player.height &&
-              attack.y + attack.height > player.y
-            ) {
-              // Reduce health
-              player.health -= 10;
-              attacks.splice(i, 1); // Remove the attack
-              if (player.health <= 0) {
-                alert(`Player ${attack.playerIndex + 1} Wins!`);
-                resetGame();
-              }
-            }
-          }
+    // Spawn enemies
+    function spawnEnemies() {
+      for (let i = 0; i < level * 2; i++) {
+        enemies.push({
+          x: Math.random() * (canvas.width - 100) + 100,
+          y: Math.random() * canvas.height,
+          width: 30,
+          height: 30,
+          speed: Math.random() * 2 + 1,
         });
-
-        // Remove off-screen attacks
-        if (attack.x < 0 || attack.x > canvas.width) {
-          attacks.splice(i, 1);
-        }
       }
     }
 
-    // Reset the game
-    function resetGame() {
-      players[0].x = 100;
-      players[0].health = 100;
-      players[1].x = 700;
-      players[1].health = 100;
-      attacks.length = 0;
+    // Shoot bullets
+    function shootBullet() {
+      bullets.push({
+        x: player.x + player.width,
+        y: player.y + player.height / 2 - 5,
+        width: 10,
+        height: 5,
+        speed: 7,
+      });
     }
 
-    // Update game state
+    // Reset game
+    function resetGame() {
+      player.health = 100;
+      bullets = [];
+      enemies = [];
+      level = 1;
+      score = 0;
+      gameOver = false;
+      spawnEnemies();
+    }
+
+    // Update game objects
     function update() {
-      players.forEach((player, index) => {
-        // Movement
-        if (keys[player.keys.left]) player.x -= 3;
-        if (keys[player.keys.right]) player.x += 3;
-        if (keys[player.keys.up] && player.y === 350) player.y -= 10; // Jump logic
+      if (gameOver) return;
 
-        // Gravity
-        if (player.y < 350) player.y += 5;
+      // Player movement
+      if (keys["ArrowUp"] && player.y > 0) player.y -= player.speed;
+      if (keys["ArrowDown"] && player.y < canvas.height - player.height) player.y += player.speed;
+      if (keys[" "] && bullets.length < 5) { // Space to shoot
+        shootBullet();
+      }
 
-        // Attack
-        if (keys[player.keys.attack]) {
-          attack(index);
-          keys[player.keys.attack] = false; // Prevent holding attack
+      // Update bullets
+      for (let i = bullets.length - 1; i >= 0; i--) {
+        bullets[i].x += bullets[i].speed;
+        if (bullets[i].x > canvas.width) {
+          bullets.splice(i, 1);
+        }
+      }
+
+      // Update enemies
+      for (let i = enemies.length - 1; i >= 0; i--) {
+        const enemy = enemies[i];
+        enemy.x -= enemy.speed;
+
+        // Check collision with player
+        if (
+          player.x < enemy.x + enemy.width &&
+          player.x + player.width > enemy.x &&
+          player.y < enemy.y + enemy.height &&
+          player.y + player.height > enemy.y
+        ) {
+          player.health -= 10;
+          enemies.splice(i, 1);
+          if (player.health <= 0) {
+            gameOver = true;
+            alert("Game Over! Press OK to restart.");
+            resetGame();
+          }
         }
 
-        // Keep player within bounds
-        player.x = Math.max(0, Math.min(canvas.width - player.width, player.x));
-      });
+        // Check collision with bullets
+        for (let j = bullets.length - 1; j >= 0; j--) {
+          const bullet = bullets[j];
+          if (
+            bullet.x < enemy.x + enemy.width &&
+            bullet.x + bullet.width > enemy.x &&
+            bullet.y < enemy.y + enemy.height &&
+            bullet.y + bullet.height > enemy.y
+          ) {
+            bullets.splice(j, 1);
+            enemies.splice(i, 1);
+            score += 10;
+            break;
+          }
+        }
+      }
 
-      // Update attacks
-      attacks.forEach((attack) => {
-        attack.x += attack.playerIndex === 0 ? 5 : -5; // Move attacks
-      });
-
-      checkCollisions(); // Check for attack collisions
+      // Check if level is complete
+      if (enemies.length === 0) {
+        level++;
+        spawnEnemies();
+      }
     }
 
     // Draw game objects
@@ -102,21 +144,28 @@
       // Clear canvas
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Draw players
-      players.forEach((player) => {
-        ctx.fillStyle = player.color;
-        ctx.fillRect(player.x, player.y, player.width, player.height);
+      // Draw player
+      ctx.fillStyle = "green";
+      ctx.fillRect(player.x, player.y, player.width, player.height);
 
-        // Draw health bar
-        ctx.fillStyle = "green";
-        ctx.fillRect(player.x, player.y - 10, (player.health / 100) * player.width, 5);
+      // Draw bullets
+      ctx.fillStyle = "yellow";
+      bullets.forEach((bullet) => {
+        ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
       });
 
-      // Draw attacks
-      attacks.forEach((attack) => {
-        ctx.fillStyle = attack.color;
-        ctx.fillRect(attack.x, attack.y, attack.width, attack.height);
+      // Draw enemies
+      ctx.fillStyle = "red";
+      enemies.forEach((enemy) => {
+        ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
       });
+
+      // Draw health and score
+      ctx.fillStyle = "white";
+      ctx.font = "20px Arial";
+      ctx.fillText(`Health: ${player.health}`, 10, 30);
+      ctx.fillText(`Score: ${score}`, 10, 60);
+      ctx.fillText(`Level: ${level}`, 10, 90);
     }
 
     // Game loop
@@ -126,5 +175,8 @@
       requestAnimationFrame(gameLoop);
     }
 
-    gameLoop();
-</script>
+    spawnEnemies(); // Start by spawning enemies
+    gameLoop(); // Start the game loop
+  </script>
+</body>
+</html>
