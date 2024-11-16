@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Caption Chaos</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #333;
+      color: white;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+    .photo {
+      margin: 20px auto;
+      border: 2px solid white;
+      max-width: 80%;
+      height: auto;
+    }
+    .caption-input {
+      margin-top: 20px;
+    }
+    .captions {
+      margin-top: 20px;
+      text-align: left;
+      padding: 10px;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <h1>Caption Chaos</h1>
+  <p>Write your funniest caption for the photo below!</p>
+  <img id="randomPhoto" class="photo" src="" alt="Random Photo">
+  <div class="caption-input">
+    <input type="text" id="caption" placeholder="Enter your caption here..." />
+    <button id="submitCaption">Submit Caption</button>
+  </div>
+  <div id="captionList" class="captions"></div>
+  <script>
+    // Example photo library (replace with uploaded photos later)
+    const photoLibrary = [
+      "https://via.placeholder.com/800x400?text=Funny+Photo+1",
+      "https://via.placeholder.com/800x400?text=Funny+Photo+2",
+      "https://via.placeholder.com/800x400?text=Funny+Photo+3",
+    ];
+
+    // Display a random photo
+    const randomPhoto = document.getElementById("randomPhoto");
+    const randomIndex = Math.floor(Math.random() * photoLibrary.length);
+    randomPhoto.src = photoLibrary[randomIndex];
+
+    // Caption submission
+    const captionInput = document.getElementById("caption");
+    const submitCaption = document.getElementById("submitCaption");
+    const captionList = document.getElementById("captionList");
+    let captions = [];
+
+    submitCaption.addEventListener("click", () => {
+      const captionText = captionInput.value.trim();
+      if (captionText) {
+        captions.push(captionText);
+        captionInput.value = "";
+        displayCaptions();
+      }
+    });
+
+    // Display all captions
+    function displayCaptions() {
+      captionList.innerHTML = "";
+      captions.forEach((caption, index) => {
+        const captionDiv = document.createElement("div");
+        captionDiv.textContent = `${index + 1}: ${caption}`;
+        captionList.appendChild(captionDiv);
+      });
+    }
+  </script>
+</body>
+</html>
